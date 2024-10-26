@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Test - Dragon Ball Style</title>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <style>
+    body {
+      background-color: #1e1e1e; /* Fondo oscuro para resaltar los elementos */
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Saiyan Sans', sans-serif;
+      color: #ffcc00;
+      text-shadow: 3px 3px 0px #ff6600, 6px 6px 0px #ff3300;
+      margin-top: 20px;
+      font-size: 3em;
+      text-transform: uppercase;
+    }
+
+    #messages {
+      margin: 30px auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 20px;
+      border: 2px solid #ffcc00;
+      width: 70%;
+      height: 300px;
+      overflow-y: auto;
+      color: #fff;
+    }
+
+    p {
+      font-size: 1.5em;
+      margin: 10px 0;
+      color: #ffcc00;
+    }
+
+    /* Botón de energía */
+    .energy-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ff6600;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 1.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .energy-button:hover {
+      background-color: #ffcc00;
+      transform: scale(1.1);
+    }
+
+    /* Estilo de los mensajes */
+    .message {
+      font-family: 'Saiyan Sans', sans-serif;
+      font-size: 1.5em;
+      color: #ffcc00;
+      text-shadow: 1px 1px 2px #ff6600;
+    }
+
+    /* Fuentes de Dragon Ball */
+    @font-face {
+      font-family: 'Saiyan Sans';
+      src: url('https://fontmeme.com/permalink/201909/9d1b7eae1f28b2d7ac8779aab2c853fa.ttf');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* Animación de los mensajes */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    p {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>Socket.IO Test - Dragon Ball Style</h1>
+
+  <!-- Sección para mostrar mensajes en la interfaz -->
+  <div id="messages"></div>
+
+  <!-- Botón de acción (simulación de energía) -->
+  <button class="energy-button" onclick="emitEnergy()">¡Enviar Energía!</button>
+
+  <script>
+    const socket = io('http://localhost:3000');
+    const messagesDiv = document.getElementById('messages');
+
+    // Función para agregar mensajes a la interfaz
+    function addMessage(message) {
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      messagesDiv.appendChild(messageElement);
+    }
+
+    // Función para enviar energía al servidor
+    function emitEnergy() {
+      socket.emit('message', '¡Energía enviada desde el cliente! Kamehamehaaaa!');
+    }
+
+    socket.on('connect', () => {
+      console.log('Conectado al servidor');
+      addMessage('Conectado al servidor');
+
+      // Enviar mensaje al servidor
+      socket.emit('message', '¡Hola desde el cliente, Kakarotto!');
+    });
+
+    // Escuchar evento 'newCharacter' cuando se cree un nuevo personaje
+    socket.on('newCharacter', (data) => {
+      console.log('Nuevo personaje creado:', data);
+      addMessage(`Nuevo personaje creado: ${data.name} (ID: ${data._id})`);
+    });
+
+    // Escuchar evento 'updatedCharacter' cuando un personaje sea actualizado
+    socket.on('updatedCharacter', (data) => {
+      console.log('Personaje actualizado:', data);
+      addMessage(`Personaje actualizado: ${data.name} (ID: ${data._id})`);
+    });
+
+    // Escuchar evento 'deletedCharacter' cuando un personaje sea eliminado
+    socket.on('deletedCharacter', (data) => {
+      console.log('Personaje eliminado:', data);
+      addMessage(`Personaje eliminado: (ID: ${data.id})`);
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('Desconectado del servidor');
+      addMessage('Desconectado del servidor');
+    });
+  </script>
+</body>
+</html>
